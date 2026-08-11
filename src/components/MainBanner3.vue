@@ -207,13 +207,13 @@ export default defineComponent({
       mainSlider: [
         {
           img: slide_pic1,
-          subtitle: 'Gaikawad Sardar Wada',
+          subtitle: 'Gaikwad Sardar Wada',
           titleLine1: 'Experience Heritage',
           titleLine2: 'With A ',
           highlight: 'Royal',
           titleLine3: ' Legacy',
           description:
-            'Step into the timeless beauty of Gaikawad Sardar Wada — a heritage space that reflects traditional architecture, cultural pride, and the rich legacy of Maharashtra.',
+            'Step into the timeless beauty of Gaikwad Sardar Wada — a heritage space that reflects traditional architecture, cultural pride, and the rich legacy of Maharashtra.',
           primaryBtn: 'Explore Wada',
           secondaryBtn: 'Know History',
           primaryLink: '/services',
@@ -241,7 +241,7 @@ export default defineComponent({
           highlight: 'Tradition',
           titleLine3: '',
           description:
-            'Gaikawad Sardar Wada is more than a structure — it is a living memory of culture, pride, history, and the royal heritage of Maharashtra.',
+            'Gaikwad Sardar Wada is more than a structure — it is a living memory of culture, pride, history, and the royal heritage of Maharashtra.',
           primaryBtn: 'Visit Now',
           secondaryBtn: 'Learn More',
           primaryLink: '/contact-us',

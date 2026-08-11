@@ -30,7 +30,7 @@
                       “ Mauris justo augue, laoreet quis faucibus et, ultrices eu ante. Duis magna
                       eratut dui eu maximus metus bibendum suscipit ”
                     </p>
-                    <cite>Visva</cite>
+                    <cite>Gaikwad Sardar Wada</cite>
                   </blockquote>
                   <div class="alignleft w-50">
                     <img alt="" src="@/assets/images/blog/blog-grid/pic1.jpg" class="w-100" />
