@@ -43,22 +43,30 @@
             <h6 class="sub-title text-primary">GET IN TOUCH</h6>
             <h2 class="title">Plan Your Stay or Event</h2>
           </div>
-          <form class="dz-form dzForm contact-bx" method="POST">
-            <input
-              type="hidden"
-              class="form-control"
-              name="dzToDo"
-              value="Contact"
-            />
-            <div class="dzFormMsg"></div>
+          <form class="dz-form contact-bx" @submit.prevent="submitForm">
+            <div
+              v-if="status === 'success'"
+              class="dzFormMsg alert alert-success"
+            >
+              Thank you! Your enquiry has been sent — we'll get back to you shortly.
+            </div>
+            <div
+              v-else-if="status === 'error'"
+              class="dzFormMsg alert alert-danger"
+            >
+              Something went wrong sending your enquiry. Please try again, or
+              reach us directly on WhatsApp / phone.
+            </div>
             <div class="row sp10">
               <div class="col-sm-6 m-b20">
                 <div class="input-group">
                   <input
+                    v-model="form.firstName"
                     type="text"
                     class="form-control"
                     required
-                    name="dzFirstName"
+                    name="firstName"
+                    autocomplete="given-name"
                     placeholder="First Name"
                   />
                 </div>
@@ -66,10 +74,12 @@
               <div class="col-sm-6 m-b20">
                 <div class="input-group">
                   <input
+                    v-model="form.lastName"
                     type="text"
                     class="form-control"
                     required
-                    name="dzLastName"
+                    name="lastName"
+                    autocomplete="family-name"
                     placeholder="Last Name"
                   />
                 </div>
@@ -77,10 +87,12 @@
               <div class="col-sm-6 m-b20">
                 <div class="input-group">
                   <input
-                    type="text"
+                    v-model="form.email"
+                    type="email"
                     class="form-control"
                     required
-                    name="dzEmail"
+                    name="email"
+                    autocomplete="email"
                     placeholder="Email"
                   />
                 </div>
@@ -88,10 +100,12 @@
               <div class="col-sm-6 m-b20">
                 <div class="input-group">
                   <input
-                    type="text"
+                    v-model="form.phone"
+                    type="tel"
                     class="form-control"
                     required
-                    name="dzPhoneNumber"
+                    name="phone"
+                    autocomplete="tel"
                     placeholder="Phone No."
                   />
                 </div>
@@ -99,10 +113,11 @@
               <div class="col-sm-12 m-b20">
                 <div class="input-group">
                   <input
+                    v-model="form.subject"
                     type="text"
                     class="form-control"
                     required
-                    name="dzOther"
+                    name="subject"
                     placeholder="Subject"
                   />
                 </div>
@@ -110,33 +125,22 @@
               <div class="col-sm-12 m-b20">
                 <div class="input-group">
                   <textarea
-                    name="dzMessage"
+                    v-model="form.message"
+                    name="message"
                     rows="5"
                     class="form-control"
                     placeholder="Message"
                   ></textarea>
                 </div>
               </div>
-              <div class="col-sm-12 m-b20">
-                <div class="input-recaptcha">
-                  <div class="g-recaptcha"></div>
-                  <input
-                    class="form-control d-none"
-                    style="display: none"
-                    data-recaptcha="true"
-                    required
-                    data-error="Please complete the Captcha"
-                  />
-                </div>
-              </div>
               <div class="col-sm-12 text-center">
                 <button
-                  name="submit"
-                  type="reset"
-                  value="submit"
+                  type="submit"
                   class="btn btn-primary btn-rounded"
+                  :disabled="status === 'submitting'"
                 >
-                  SUBMIT <i class="m-l10 fas fa-caret-right"></i>
+                  {{ status === "submitting" ? "SENDING..." : "SUBMIT" }}
+                  <i class="m-l10 fas fa-caret-right"></i>
                 </button>
               </div>
             </div>
@@ -149,13 +153,63 @@
 
 <script lang="ts">
 import CommonBanner from "@/elements/CommonBanner.vue";
-import { defineComponent } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 import bnr2 from "@/assets/images/banner/bnr2.jpg";
+
+// Paste the URL you get after deploying google-apps-script/Code.gs as a
+// Web App (see that file for setup steps).
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyHdhq92nj45HMEGyNZJ1JI1gvWFJ8JIR4X7ZoHWkOaEq6mfaeaME11VPCqlb-CUiiPrQ/exec";
 
 export default defineComponent({
   setup() {
+    const form = reactive({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
+    });
+
+    const status = ref<"idle" | "submitting" | "success" | "error">("idle");
+
+    const submitForm = async () => {
+      if (status.value === "submitting") return;
+      status.value = "submitting";
+
+      // application/x-www-form-urlencoded keeps this a CORS "simple request"
+      // so the browser skips a preflight OPTIONS call (which Apps Script
+      // web apps don't handle) and we can read the real response back.
+      const body = new URLSearchParams();
+      (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
+        body.append(key, form[key]);
+      });
+
+      try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          body,
+        });
+        const data = await res.json();
+        if (data.result === "success") {
+          status.value = "success";
+          (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
+            form[key] = "";
+          });
+        } else {
+          status.value = "error";
+        }
+      } catch (err) {
+        status.value = "error";
+      }
+    };
+
     return {
       bnr2,
+      form,
+      status,
+      submitForm,
       contactDtail: [
         {
           dataName: "01",
@@ -185,4 +239,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.dzFormMsg {
+  margin-bottom: 20px;
+}
+</style>
